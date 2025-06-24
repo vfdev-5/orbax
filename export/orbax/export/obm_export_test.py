@@ -20,7 +20,9 @@ from absl.testing import parameterized
 import jax
 from jax import sharding
 from jax.experimental import mesh_utils
+from jax.experimental.topologies import get_topology_desc
 import jax.numpy as jnp
+import numpy as np
 from orbax.export import constants
 from orbax.export import jax_module
 from orbax.export import obm_configs
