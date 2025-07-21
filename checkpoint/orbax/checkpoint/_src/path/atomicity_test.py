@@ -64,26 +64,6 @@ class AtomicRenameTemporaryPathTest(
     self.assertIsNone(deserialized._checkpoint_metadata_store)
     # pylint: enable=protected-access
 
-  @parameterized.parameters(
-      ('ckpt', f'ckpt{TMP_DIR_SUFFIX}5', True),
-      ('ckpt', f'ckpt{TMP_DIR_SUFFIX}11001', True),
-      ('state', f'state{TMP_DIR_SUFFIX}1', True),
-      ('state', f'state{TMP_DIR_SUFFIX}s', True),
-      ('state', f'state{TMP_DIR_SUFFIX}', True),
-      ('foo', f'{TMP_DIR_SUFFIX}12', False),
-      ('foo', f'f{TMP_DIR_SUFFIX}12', False),
-      ('foo', 'foo-checkpoint-tmp-2', False),
-  )
-  def test_match(
-      self, final_name: epath.Path, tmp_name: epath.Path, result: bool
-  ):
-    self.assertEqual(
-        result,
-        AtomicRenameTemporaryPath.match(
-            self.directory / tmp_name, self.directory / final_name
-        ),
-    )
-
   async def test_create(self):
     path = self.directory / 'ckpt'
     tmp_path = AtomicRenameTemporaryPath.from_final(path)
@@ -129,20 +109,6 @@ class CommitFileTemporaryPathTest(
     tmp_path = CommitFileTemporaryPath.from_final(path)
     self.assertEqual(path, tmp_path.get())
 
-
-  @parameterized.parameters(
-      ('ckpt', 'ckpt', True),
-      ('ckpt', 'foo', False),
-  )
-  def test_match(
-      self, final_name: epath.Path, tmp_name: epath.Path, result: bool
-  ):
-    self.assertEqual(
-        result,
-        CommitFileTemporaryPath.match(
-            self.directory / tmp_name, self.directory / final_name
-        ),
-    )
 
   async def test_create(self):
     path = self.directory / 'ckpt'

@@ -54,7 +54,6 @@ from __future__ import annotations
 
 import asyncio
 import pickle
-import re
 import threading
 import time
 from typing import Awaitable, Optional, Protocol, Sequence, Type, TypeVar
@@ -253,15 +252,6 @@ class AtomicRenameTemporaryPath(_TemporaryPathBase):
         file_options=file_options,
     )
 
-  @classmethod
-  def match(cls, temporary_path: epath.Path, final_path: epath.Path) -> bool:
-    if re.match(
-        _get_tmp_directory_pattern(final_path.name),
-        temporary_path.name,
-    ):
-      return temporary_path.parent == final_path.parent
-    return False
-
   def get(self) -> epath.Path:
     return self._tmp_path
 
@@ -344,13 +334,6 @@ class CommitFileTemporaryPath(_TemporaryPathBase):
         final_path,
         checkpoint_metadata_store=checkpoint_metadata_store,
         file_options=file_options,
-    )
-
-  @classmethod
-  def match(cls, temporary_path: epath.Path, final_path: epath.Path) -> bool:
-    return (
-        temporary_path.name == final_path.name
-        and temporary_path.parent == final_path.parent
     )
 
   def get(self) -> epath.Path:
