@@ -35,7 +35,7 @@ class Snapshot(Protocol):
     """Creates a snapshot of the checkpoint."""
     pass
 
-  async def release_snapshot(self) -> bool:
+  async def release_snapshot(self) -> None:
     """Deletes a snapshot of the checkpoint."""
     pass
 
@@ -49,7 +49,7 @@ class _DefaultSnapshot(Snapshot):
     self._source = epath.Path(src)
     self._snapshot = epath.Path(dst)
 
-  async def create_snapshot(self):
+  async def create_snapshot(self) -> None:
     """Creates a deep copy of the checkpoint."""
     if not await asyncio.to_thread(epath.Path(self._snapshot).is_absolute):
       raise ValueError(
@@ -69,19 +69,12 @@ class _DefaultSnapshot(Snapshot):
         t.get_duration(),
     )
 
-  async def release_snapshot(self) -> bool:
+  async def release_snapshot(self) -> None:
     """Deletes a snapshot of the checkpoint."""
     if not await asyncio.to_thread(epath.Path(self._snapshot).exists):
-      logging.error("Snapshot does not exist: %s", self._snapshot)
-      return False
+      raise FileNotFoundError(f"Snapshot does not exist: {self._snapshot}")
 
-    try:
-      await asyncio.to_thread(epath.Path(self._snapshot).rmtree)
-    except OSError as e:
-      logging.error(e)
-      return False
-    else:
-      return True
+    await asyncio.to_thread(epath.Path(self._snapshot).rmtree)
 
 
 def create_instance(source: epath.Path, snapshot: epath.Path):
